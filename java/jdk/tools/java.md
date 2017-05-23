@@ -9,3 +9,7 @@
 * -D<名称>=<值>: 设置系统属性
 * -version: 输出产品版本并退出
 * -X: 输出非标准选项的帮助
+
+#### 入口
+
+`hotspot/jdk/src/share/bin/main.c`
