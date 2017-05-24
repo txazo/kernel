@@ -1,0 +1,43 @@
+# Zookeeper配置参考QuorumPeerConfig.parseProperties()
+
+# 心跳的间隔时间
+tickTime=2000
+
+# 初始化连接时的最大心跳数
+initLimit=10
+# 请求和应答时的最大心跳数
+syncLimit=5
+
+# 数据文件目录
+dataDir=/var/lib/zookeeper/data/server1
+# 日志文件目录
+dataLogDir=/var/lib/zookeeper/datalog/server1
+
+# 客户端连接端口
+clientPort=2181
+
+# 最大客户端连接数
+maxClientCnxns=60
+
+# 最小会话超时时间
+minSessionTimeout=2
+# 最大会话超时时间
+maxSessionTimeout=20
+
+# 选举算法，默认为3
+electionAlg=3
+
+# 节点类型，participant或observer
+peerType=participant
+
+# 自动清理的间隔时间，单位小时，0代表禁用
+autopurge.purgeInterval=1
+# 自动清理保留的文件数
+autopurge.snapRetainCount=3
+
+# server.[节点id]=[节点地址]:[节点通信端口]:[节点选举端口]
+server.1=127.0.0.1:2881:2891
+server.2=127.0.0.1:2882:2892
+server.3=127.0.0.1:2883:2893
+server.4=127.0.0.1:2884:2894
+server.5=127.0.0.1:2885:2895
