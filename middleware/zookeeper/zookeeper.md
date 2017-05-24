@@ -36,6 +36,60 @@ Main-Class: org.apache.zookeeper.server.quorum.QuorumPeerMain
 
 * `echo cons | nc localhost 2181`: 输出节点上连接的客户端信息
 
+#### Zookeeper内存快照文件(dataDir)
+
+* myid
+* version-2/acceptedEpoch
+* version-2/currentEpoch
+* snapshot.{zxid}
+
+#### snapshot文件格式
+
+```
+fileheader
+    magic: 4字节, 1514885966
+    version: 4字节, 2
+    dbid: 8字节, -1
+count: 4字节, session个数
+foreach {count}:
+    id: 8字节, session的id
+    timeout: 4字节, session的timeout
+tree
+    map: 4字节
+    foreach {map}:
+        long: 8字节
+        acls: 4字节
+        foreach {acls}:
+            acl
+                perms:
+                id
+                    scheme
+                    id:
+    path
+        len: 4字节, path长度
+        value: string
+    node
+        data
+            len: 4字节, data长度
+            value: string
+        acl: 8字节
+        statpersisted
+            czxid: 8字节
+            mzxid: 8字节
+            ctime: 8字节
+            mtime: 8字节
+            version: 4字节
+            cversion: 4字节
+            aversion: 4字节
+            ephemeralOwner: 8字节
+            pzxid: 8字节
+            
+```
+
+#### Zookeeper事务日志文件(dataLogDir)
+
+* version-2/log.{zxid}
+
 #### Zookeeper数据模型
 
 #### 数据快照
