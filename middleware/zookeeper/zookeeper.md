@@ -8,28 +8,35 @@
 * 配置
 * 同步
 
-#### Zookeeper节点状态(ServerState)
+#### Zookeeper Server
+
+节点状态(参考ServerState)
 
 * LOOKING
 * LEADING
 * FOLLOWING
 * OBSERVING
 
+节点类型(参考LearnerType)
+
+* PARTICIPANT: 参与选举，同步Leader数据，处理客户端读写
+* OBSERVER: 不参入选举，同步Leader数据，处理客户端读写
+
 #### Zookeeper配置
 
 参考 [zoo.cfg](zoo.cfg.md)
 
-ServerId即${dataDir}/myid文件中的数字，同server.id保持一致
+`server id`: ${dataDir}/myid文件中的数字
 
-查看节点配置，`echo conf | nc localhost 2181`
+查看节点配置: `echo conf | nc localhost 2181`
 
 #### Zookeeper启动
 
-Main-Class: org.apache.zookeeper.server.quorum.QuorumPeerMain
+Main-Class: `org.apache.zookeeper.server.quorum.QuorumPeerMain`
 
 #### Zookeeper节点状态检测
 
-* `bin/zkCli.sh -server 127.0.0.1:2181`
+* 客户端连接Zookeeper: `bin/zkCli.sh -server 127.0.0.1:2181`
 * `echo stat | nc localhost 2181`
 
 #### 其它四字命令(参考ServerCnxn)
@@ -41,53 +48,67 @@ Main-Class: org.apache.zookeeper.server.quorum.QuorumPeerMain
 * myid
 * version-2/acceptedEpoch
 * version-2/currentEpoch
-* snapshot.{zxid}: zxid为最小的xzid
+* snapshot.{zxid}: zxid为该文件最小的xzid
+
+```
+-rw-r--r--  1 txazo  wheel        2  5 25 16:54 acceptedEpoch
+-rw-r--r--  1 txazo  wheel        2  5 25 16:54 currentEpoch
+-rw-r--r--  1 txazo  wheel      296  5 23 17:55 snapshot.0
+-rw-r--r--  1 txazo  wheel  9179214  5 25 16:42 snapshot.1100000013
+-rw-r--r--  1 txazo  wheel  9179398  5 25 16:44 snapshot.1200000002
+```
 
 #### snapshot文件格式
 
+log格式化输出: `java -cp /usr/local/zookeeper/zookeeper-3.4.8.jar -Djava.ext.dirs=/usr/local/zookeeper/lib org.apache.zookeeper.server.SnapshotFormatter /var/lib/zookeeper/data/server1/version-2/snapshot.1100000013`
+
 ```
-fileheader
-    magic: 4字节, 1514885966
-    version: 4字节, 2
-    dbid: 8字节, -1
-count: 4字节, session个数
-foreach {count}:
-    id: 8字节, session的id
-    timeout: 4字节, session的timeout
-tree
-    map: 4字节
-    foreach {map}:
-        long: 8字节
-        acls: 4字节
-        foreach {acls}:
-            acl
-                perms:
-                id
-                    scheme
-                    id:
-    path
-        len: 4字节, path长度
-        value: string
-    node
-        data
-            len: 4字节, data长度
-            value: string
-        acl: 8字节
-        statpersisted
-            czxid: 8字节
-            mzxid: 8字节
-            ctime: 8字节
-            mtime: 8字节
-            version: 4字节
-            cversion: 4字节
-            aversion: 4字节
-            ephemeralOwner: 8字节
-            pzxid: 8字节      
+FileHeader {
+    int magic
+    int version
+    long dbid
+} fileheader // 文件头
+int count // session个数
+{
+    long id // 会话id
+    int timeout // 超时时间
+} session[count] // session数组
+DataTree {
+    int map
+    {
+        long long
+        ACL {
+            int perms
+            Id {
+                string scheme
+                string id
+            } id
+        } acl[]
+    } [map]
+    {
+        string path
+        DataNode {
+            byte[] data // 节点数据
+            long acl
+            StatPersisted {
+                long czxid // 节点创建时的xzid
+                long mzxid // 节点最近更新的xzid
+                long ctime // 节点创建时的时间戳
+                long mtime // 节点最近更新的时间戳
+                int version // 节点数据更新次数
+                int cversion // 子节点更新次数
+                int aversion // 节点acl更新次数
+                long ephemeralOwner // 临时节点的session id
+                long pzxid // 子节点最近更新的xzid
+            } statpersisted
+        } node
+    } []
+} tree
 ```
 
 #### Zookeeper事务日志文件(dataLogDir)
 
-* version-2/log.{zxid}: zxid为最小的xzid
+* version-2/log.{zxid}: zxid为该文件最小的xzid
 
 ```
 -rw-r--r--  1 txazo  wheel  67108880  5 23 18:01 log.500000001
@@ -99,7 +120,7 @@ tree
 
 #### log文件格式
 
-log格式化输出类: `java -cp /usr/local/zookeeper/zookeeper-3.4.8.jar -Djava.ext.dirs=/usr/local/zookeeper/lib org.apache.zookeeper.server.LogFormatter /var/lib/zookeeper/datalog/server1/version-2/log.f00000001`
+log格式化输出: `java -cp /usr/local/zookeeper/zookeeper-3.4.8.jar -Djava.ext.dirs=/usr/local/zookeeper/lib org.apache.zookeeper.server.LogFormatter /var/lib/zookeeper/datalog/server1/version-2/log.f00000001`
 
 ```
 FileHeader {
@@ -107,8 +128,8 @@ FileHeader {
     int version
     long dbid
 } fileheader
-long crcvalue // 检验和
 {
+    long crcvalue // 检验和
     TxnHeader {
         long clientId
         int cxid
@@ -154,13 +175,52 @@ long crcvalue // 检验和
     ErrorTxn {
         int err
     } txn
+    byte EOR // 事务结束
 } txnEntry[]
 ```
 
 #### xzid
 
+zxid: 递增的事务id
+
+#### ACL(Access Control List)
+
+访问控制列表
+
+* `scheme:id`: 权限机制
+    * world: `world:anyone`
+    * auth
+    * digest
+    * ip
+* `permission`: 五种权限(READ | WRITE | CREATE | DELETE | ADMIN)
+
 #### Zookeeper数据模型
 
-#### 数据快照
+path: `/path1/path2/...`
 
-#### 事务日志
+```
+DataTree {
+    Map<String, DataNode> nodes // path/节点映射
+    Map<Long, List<ACL>> longKeyMap // DataNode的acl/List<ACL>的映射
+    Map<Long, HashSet<String>> ephemerals // session id/临时节点path集合的映射
+    WatchManager dataWatches 节点数据watch
+    WatchManager childWatches 子节点watch
+}
+DataNode {
+    byte[] data // 节点数据
+    long acl
+    StatPersisted {
+        
+    } stat // 统计信息
+    DataNode parent // 父节点
+    Set<String> children // 子节点列表
+}
+WatchManager {
+    HashMap<String, HashSet<Watcher>> watchTable
+    HashMap<Watcher, HashSet<String>> watch2Paths
+}
+```
+
+#### Zookeeper临时节点实现
+
+#### Zookeeper顺序节点实现
