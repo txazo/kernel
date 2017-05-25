@@ -41,7 +41,7 @@ Main-Class: org.apache.zookeeper.server.quorum.QuorumPeerMain
 * myid
 * version-2/acceptedEpoch
 * version-2/currentEpoch
-* snapshot.{zxid}
+* snapshot.{zxid}: zxid为最小的xzid
 
 #### snapshot文件格式
 
@@ -82,13 +82,82 @@ tree
             cversion: 4字节
             aversion: 4字节
             ephemeralOwner: 8字节
-            pzxid: 8字节
-            
+            pzxid: 8字节      
 ```
 
 #### Zookeeper事务日志文件(dataLogDir)
 
-* version-2/log.{zxid}
+* version-2/log.{zxid}: zxid为最小的xzid
+
+```
+-rw-r--r--  1 txazo  wheel  67108880  5 23 18:01 log.500000001
+-rw-r--r--  1 txazo  wheel  67108880  5 24 10:56 log.500000004
+-rw-r--r--  1 txazo  wheel  67108880  5 24 15:40 log.b00000001
+-rw-r--r--  1 txazo  wheel  67108880  5 25 10:13 log.c00000001
+-rw-r--r--  1 txazo  wheel  67108880  5 25 10:15 log.c00011629
+```
+
+#### log文件格式
+
+log格式化输出类: `java -cp /usr/local/zookeeper/zookeeper-3.4.8.jar -Djava.ext.dirs=/usr/local/zookeeper/lib org.apache.zookeeper.server.LogFormatter /var/lib/zookeeper/datalog/server1/version-2/log.f00000001`
+
+```
+FileHeader {
+    int magic
+    int version
+    long dbid
+} fileheader
+long crcvalue // 检验和
+{
+    TxnHeader {
+        long clientId
+        int cxid
+        long zxid
+        long time
+        int type
+    } hdr
+    CreateSessionTxn {
+        int timeOut
+    } |
+    CreateTxn {
+        string path
+        byte[] data
+        ACL {
+            int perms
+            Id {
+                string scheme
+                string id
+            } id
+        } acl[]
+        bool ephemeral
+        int parentCVersion
+    } |
+    DeleteTxn {
+        string path
+    } |
+    SetDataTxn {
+        string path
+        byte[] data
+        int version
+    } |
+    SetACLTxn {
+        string path
+        ACL {
+            int perms
+            Id {
+                string scheme
+                string id
+            } id
+        } acl[]
+        int version
+    } |
+    ErrorTxn {
+        int err
+    } txn
+} txnEntry[]
+```
+
+#### xzid
 
 #### Zookeeper数据模型
 
