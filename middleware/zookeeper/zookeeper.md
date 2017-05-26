@@ -98,7 +98,7 @@ DataTree {
                 int version // 节点数据更新次数
                 int cversion // 子节点更新次数
                 int aversion // 节点acl更新次数
-                long ephemeralOwner // 临时节点的session id
+                long ephemeralOwner // 临时节点的session id, 非临时节点则为0
                 long pzxid // 子节点最近更新的xzid
             } statpersisted
         } node
