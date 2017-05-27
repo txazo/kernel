@@ -27,7 +27,7 @@ public synchronized void start() {
 ```
 
 * `loadDataBase()`: [加载内存数据库](#加载内存数据库)
-* `cnxnFactory.start()`: [NIOServerCnxnFactory](#NIOServerCnxnFactory)
+* `cnxnFactory.start()`: [客户端连接工厂](#客户端连接工厂)
 * `startLeaderElection()`: [Leader选举](#Leader选举)
 
 #### 加载内存数据库
@@ -40,6 +40,23 @@ public synchronized void start() {
 * 继续读取事务日志，根据事务日志恢复`DataTree`，并更新`lastProcessedZxid`
 * 从`lastProcessedZxid`中解析出`epoch`，校验`currentEpoch`和`acceptedEpoch`
 
-#### NIOServerCnxnFactory
+#### 客户端连接工厂
 
-#### Leader选举
+客户端连接工厂默认实现类: `org.apache.zookeeper.server.NIOServerCnxnFactory`
+
+`NIOServerCnxnFactory.run()`:
+
+* 循环`select()`，循环处理已就绪的`SelectionKey`
+* `OP_ACCEPT`事件: 新的客户端连接，先判断已连接的客户端连接总数是否达到`maxClientCnxns`，达到就断开连接，否则新建`NIOServerCnxn`附加到`SelectionKey`上
+* `OP_READ`事件、`OP_WRITE`事件: 获取`SelectionKey`上附加的`NIOServerCnxn`，调用`NIOServerCnxn.doIO()`处理IO读写
+
+* `org.apache.zookeeper.server.quorum.CommitProcessor`
+* `org.apache.zookeeper.server.quorum.Leader$ToBeAppliedRequestProcessor.processRequest()`
+* `org.apache.zookeeper.server.FinalRequestProcessor.processRequest()`
+* `org.apache.zookeeper.server.ZooKeeperServer.processTxn()`
+* `org.apache.zookeeper.server.DataTree.processTxn()`
+
+#### FastLeader选举
+
+* 初始化`QuorumCnxManager`
+* 启动`QuorumCnxManager$Listener`线程
