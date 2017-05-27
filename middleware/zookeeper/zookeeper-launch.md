@@ -2,8 +2,6 @@
 
 启动入口类: `org.apache.zookeeper.server.quorum.QuorumPeerMain`
 
-[加载内存数据库](#加载内存数据库)
-
 #### QuorumPeerMain
 
 * 读取并解析`zoo.cfg`配置文件
@@ -29,6 +27,19 @@ public synchronized void start() {
 ```
 
 * `loadDataBase()`: [加载内存数据库](#加载内存数据库)
-* 
+* `cnxnFactory.start()`: [NIOServerCnxnFactory](#NIOServerCnxnFactory)
+* `startLeaderElection()`: [Leader选举](#Leader选举)
 
 #### 加载内存数据库
+
+* `ZKDatabase.loadDataBase()`
+* 在`dataDir`目录中逐个处理文件名中zxid最大的snapshot文件，反序列化为`DataTree`，并通过CRC检验
+* `lastProcessedZxid` = 上一步snapshot文件名的zxid
+* 在`dataLogDir`目录中选取文件名zxid大于或等于`lastProcessedZxid`的log文件和zxid小于`lastProcessedZxid`的最新一个文件为待恢复的log文件
+* 从待恢复的log文件中，按zxid从小到大的顺序逐行读取事务日志，直到事务的zxid不小于`lastProcessedZxid + 1`
+* 继续读取事务日志，根据事务日志恢复`DataTree`，并更新`lastProcessedZxid`
+* 从`lastProcessedZxid`中解析出`epoch`，校验`currentEpoch`和`acceptedEpoch`
+
+#### NIOServerCnxnFactory
+
+#### Leader选举
