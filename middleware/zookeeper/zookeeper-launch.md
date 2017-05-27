@@ -2,6 +2,8 @@
 
 启动入口类: `org.apache.zookeeper.server.quorum.QuorumPeerMain`
 
+[加载内存数据库](#加载内存数据库)
+
 #### QuorumPeerMain
 
 * 读取并解析`zoo.cfg`配置文件
