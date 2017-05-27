@@ -26,7 +26,7 @@ public synchronized void start() {
 }
 ```
 
-* `loadDataBase()`:
+* `loadDataBase()`: [加载内存数据库](#加载内存数据库)
 * 
 
 #### 加载内存数据库
