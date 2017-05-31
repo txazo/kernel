@@ -55,8 +55,3 @@ public synchronized void start() {
 * `org.apache.zookeeper.server.FinalRequestProcessor.processRequest()`
 * `org.apache.zookeeper.server.ZooKeeperServer.processTxn()`
 * `org.apache.zookeeper.server.DataTree.processTxn()`
-
-#### FastLeader选举
-
-* 初始化`QuorumCnxManager`
-* 启动`QuorumCnxManager$Listener`线程

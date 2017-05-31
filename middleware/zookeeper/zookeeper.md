@@ -209,8 +209,7 @@ DataTree {
 DataNode {
     byte[] data // 节点数据
     long acl
-    StatPersisted {
-        
+    StatPersisted { 
     } stat // 统计信息
     DataNode parent // 父节点
     Set<String> children // 子节点列表
