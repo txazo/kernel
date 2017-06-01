@@ -7,7 +7,11 @@
 
 #### 下载安装
 
-* [下载Docker Toolbox](https://www.docker.com/products/docker-toolbox)
-* 安装`Docker Toolbox`
-* 启动`Docker Quickstart Terminal`
-* 输入`docker run hello-world`验证安装
+* 下载[Docker Toolbox](https://www.docker.com/products/docker-toolbox)
+* 安装Docker Toolbox
+* 运行Docker Quickstart Terminal
+* 安装验证
+
+```
+docker run hello-world
+```
