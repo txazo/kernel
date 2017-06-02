@@ -1,31 +1,73 @@
 ## Dockerfile
 
-#### friendlyhello
+Dockerfile是一个包括所有的用来组装镜像的命令的文本文档
 
-镜像包含文件:
-
-* [Dockerfile](dockerfile/friendlyhello/Dockerfile)
-* [requirements.txt](dockerfile/friendlyhello/requirements.txt)
-* [app.py](dockerfile/friendlyhello/app.py)
-
-build镜像:
+#### Dockerfile格式
 
 ```
-docker build -t friendlyhello .
+# Comment
+INSTRUCTION arguments
 ```
 
-运行镜像:
+#### FROM
 
 ```
-docker run -d -p 4000:80 friendlyhello
+FROM centos:7
 ```
 
-外部访问:
+#### ENV
 
-[http://192.168.99.100:4000](http://192.168.99.100:4000)
-
-停止容器:
+设置环境变量
 
 ```
-docker stop 4553a5b84f71
+ENV <key> <value>
+ENV <key>=<value> ...
+```
+
+#### WORKDIR
+
+设置工作目录
+
+```
+WORKDIR /path/to/workdir
+```
+
+#### ADD
+
+复制文件或目录并添加到镜像的文件系统的指定路径
+
+```
+ADD <src>... <dest>
+ADD ["<src>",... "<dest>"]
+```
+
+#### COPY
+
+```
+COPY <src>... <dest>
+COPY ["<src>",... "<dest>"]
+```
+
+#### EXPOSE
+
+通知Docker容器在运行时监听指定的网络端口
+
+```
+EXPOSE <port> [<port>...]
+```
+
+#### RUN
+
+执行指令
+
+```
+RUN echo "start"
+RUN ["echo", "start"]
+```
+
+#### CMD
+
+```
+CMD catalina.sh run
+CMD ["catalina.sh", "run"]
 ```
