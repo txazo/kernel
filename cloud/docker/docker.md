@@ -28,5 +28,5 @@
 
 #### Docker
 
-[Docker Hub](https://hub.docker.com/)
-[Docker Cloud](https://cloud.docker.com/)
+* [Docker Hub](https://hub.docker.com/)
+* [Docker Cloud](https://cloud.docker.com/)
