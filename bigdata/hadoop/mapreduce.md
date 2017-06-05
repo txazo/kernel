@@ -2,7 +2,7 @@
 
 MapReduce过程:
 
-[Input](#Input) - [Split](#Split) - [Map](#Map) - [Sort](#Sort)
+[Input](#Input)  ——  [Split](#Split)  ——  [Map](#Map)  ——  [Sort](#Sort)
 
 #### Input
 
