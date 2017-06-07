@@ -12,9 +12,9 @@ RUN yum install -y openssh-server openssh-clients && \
     ssh-keygen -t rsa -P '' -f /etc/ssh/ssh_host_rsa_key && \
     ssh-keygen -t ecdsa -P '' -f /etc/ssh/ssh_host_ecdsa_key && \
     ssh-keygen -t dsa -P '' -f /etc/ssh/ssh_host_ed25519_key && \
-    sed -i 's/UsePAM yes/UsePAM no/g' /etc/ssh/sshd_config
+    sed -i 's/UsePAM yes/UsePAM no/g' /etc/ssh/sshd_config && \
+    echo -e "\tStrictHostKeyChecking no" >> /etc/ssh/ssh_config
 
-# ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
 # ssh免密码登录
 ADD ssh/id_rsa ssh/id_rsa.pub /root/.ssh/
 RUN cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys && \
@@ -26,9 +26,7 @@ RUN wget --no-cookie --no-check-certificate --header "Cookie: s_cc=true;oracleli
     rm -f jdk-8u131-linux-x64.rpm
 
 # 设置jdk环境变量
-# ENV JAVA_HOME /usr/java/default
-# ENV CLASSPATH .:$JAVA_HOME/lib:$JAVA_HOME/jre/lib
-# ENV PATH $PATH:$JAVA_HOME/bin:$JAVA_HOME/jre/bin
+ENV JAVA_HOME /usr/java/default
 
 # 安装hadoop
 RUN wget http://mirror.bit.edu.cn/apache/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz && \
@@ -37,8 +35,6 @@ RUN wget http://mirror.bit.edu.cn/apache/hadoop/common/hadoop-2.7.3/hadoop-2.7.3
 
 # 设置hadoop环境变量
 ENV HADOOP_HOME /usr/local/hadoop
-# ENV HADOOP_PREFIX $HADOOP_HOME
-# ENV HADOOP_CONFIG_HOME $HADOOP_HOME/etc/hadoop
 
 # 替换hadoop配置文件
 ADD etc-hadoop/core-site.xml $HADOOP_HOME/etc/hadoop/core-site.xml
@@ -46,10 +42,11 @@ ADD etc-hadoop/hdfs-site.xml $HADOOP_HOME/etc/hadoop/hdfs-site.xml
 ADD etc-hadoop/mapred-site.xml $HADOOP_HOME/etc/hadoop/mapred-site.xml
 ADD etc-hadoop/yarn-site.xml $HADOOP_HOME/etc/hadoop/yarn-site.xml
 
-# 设置path
-# ENV PATH $PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+# 修改hadoop中JAVA_HOME
+RUN sed -i 's/export JAVA_HOME.*/export JAVA_HOME=${JAVA_HOME}/g' $HADOOP_HOME/etc/hadoop/hadoop-env.sh
 
-RUN sed -i '/^export PATH/a export JAVA_HOME="/usr/java/default"\nexport CLASSPATH=".:$JAVA_HOME/lib:$JAVA_HOME/jre/lib"\nexport HADOOP_HOME="/usr/local/hadoop"\nexport PATH="$PATH:$JAVA_HOME/bin:$JAVA_HOME/jre/bin:$HADOOP_HOME/bin:$HADOOP_HOME/sbin"' /etc/profile && \
+# 修改path环境变量
+RUN sed -i '/^export PATH/a export JAVA_HOME="${JAVA_HOME}"\nexport CLASSPATH=".:$JAVA_HOME/lib:$JAVA_HOME/jre/lib"\nexport HADOOP_HOME="${HADOOP_HOME}"\nexport PATH="$PATH:$JAVA_HOME/bin:$JAVA_HOME/jre/bin:$HADOOP_HOME/bin:$HADOOP_HOME/sbin"' /etc/profile && \
     source /etc/profile
 
 RUN yum clean all
@@ -66,4 +63,8 @@ CMD ["/usr/sbin/sshd", "-D"]
 # docker run --name slave1 -h slave1 --network hadoop-cluster --ip 172.24.1.12 -d -P -p 10222:22 centos-hadoop-cluster
 # docker run --name slave2 -h slave2 --network hadoop-cluster --ip 172.24.1.13 -d -P -p 10322:22 centos-hadoop-cluster
 
-# ssh root@192.168.99.100 -p 10122
+# ssh -o StrictHostKeyChecking=no root@192.168.99.100 -p 10122
+# ssh -o StrictHostKeyChecking=no root@192.168.99.100 -p 10222
+# ssh -o StrictHostKeyChecking=no root@192.168.99.100 -p 10322
+# ssh -o StrictHostKeyChecking=no root@172.24.1.12
+# ssh -o StrictHostKeyChecking=no root@172.24.1.13
