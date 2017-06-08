@@ -19,9 +19,9 @@ networkName="hadoop-cluster"
 networkSubnet="172.24.0.0/16"
 
 # node
-nodeHost=("master" "slave1" "slave2" "slave3")
-nodeIP=("172.24.1.10" "172.24.1.11" "172.24.1.12" "172.24.1.13")
-nodeSSHPort=(10022 10122 10222 10322)
+nodeHost=("master" "slave1" "slave2" "slave3" "slave4")
+nodeIP=("172.24.1.10" "172.24.1.11" "172.24.1.12" "172.24.1.13" "172.24.1.14")
+nodeSSHPort=(10022 10122 10222 10322 10422)
 
 # master
 masterExposePort=(8088 9000 10020 19888 50070 50090)
