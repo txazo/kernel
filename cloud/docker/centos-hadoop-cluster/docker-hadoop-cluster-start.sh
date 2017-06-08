@@ -1,10 +1,11 @@
 #!/bin/bash
 
+source ./docker-util.sh
 source ./hadoop-cluster-conf.sh
 
 image=`getProperty 'image'`
 network=`getProperty 'network'`
-networkip=`getProperty 'networkip'`
+networkIP=`getProperty 'networkip'`
 ipPrefix=`getProperty 'ipPrefix'`
 masterPortMappings=`getProperty 'masterPortMappings'`
 
@@ -18,21 +19,42 @@ docker network ls | awk 'NR > 1 {
         print 1;
     }
 }' | while read line; do
-    docker network create --subnet=$networkip $network
+    docker network create --subnet=$networkIP $network
 done
 
-port=`echo $masterPortMappings | awk 'BEGIN {FS=" "; ORS=""} {for (i = 1; i <= NF; i++) print (i == 1 ? "" : " ")$i":"$i}'`
+masterPort=`echo $masterPortMappings | awk 'BEGIN {FS=" "; ORS=""} {for (i = 1; i <= NF; i++) print (i == 1 ? "-p " : " -p ")$i":"$i}'`
+
+cleanContainer
 
 # 启动hadoop集群
 ipNumber=10
 sshPortPrefix=100
-cat hadoop-cluster-host.conf | while read hostname; do
-    docker run --name $hostname -h $hostname --network $network --ip "${ipPrefix}${ipNumber}" -d -P -p "${sshPortPrefix}"22:22 $imageName
+echo "" > host.tmp
+echo `getProperty 'clusterNodes'` | awk -F " " '{for (i = 1; i <= NF; i++) print $i}' | while read hostname; do
+    ip="${ipPrefix}${ipNumber}"
+    port="${sshPortPrefix}22"
+    cmd="docker run --name ${hostname} -h ${hostname} --network ${network} --ip ${ip} -d -P -p ${port}:22"
+    if [ $hostname = 'master' ]; then
+        eval $cmd $masterPort $image
+    else
+        eval $cmd $image
+    fi
+    echo "${ip} ${hostname}" >> host.tmp
     let ipNumber++
     let sshPortPrefix++
 done
 
-if ssh root@192.168.99.100 -p 10222 test -e /root/.ssh/id_rsa1; then
-    scp -P 10222 docker-build-init.sh root@192.168.99.100:/root
-    id_ras_pub=`ssh root@192.168.99.100 -p 10222 'chmod u+x docker-build-init.sh; ./docker-build-init.sh; rm -f docker-build-init.sh'`
-fi
+ipNumber=10
+sshPortPrefix=100
+echo `getProperty 'clusterNodes'` | awk -F " " '{for (i = 1; i <= NF; i++) print $i}' | while read hostname; do
+    ip="${ipPrefix}${ipNumber}"
+    port="${sshPortPrefix}"22
+
+    echo "1-----${ip}-----${port}"
+    scp -P $port hadoop-cluster-init.sh hadoop-cluster.conf hadoop-cluster-conf.sh host.tmp root@192.168.99.100:/root
+    echo "2-----${ip}-----${port}"
+    id_ras_pub=`ssh root@$192.168.99.100 -p $port 'chmod u+x hadoop-cluster-init.sh hadoop-cluster-conf.sh; ./hadoop-cluster-init.sh'`
+    echo $id_ras_pub
+    let ipNumber++
+    let sshPortPrefix++
+done

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-conf="hadoop-cluster.conf"
+conf="./hadoop-cluster.conf"
 
 function getProperty() {
     key=$1
