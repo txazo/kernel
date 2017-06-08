@@ -2,9 +2,8 @@
 #
 # Usage: Build Hadoop Cluster Image
 
-source ./hadoop-cluster-conf.sh
+source ./hadoop-cluster-env.sh
 
 source ./hadoop-build-init.sh
 
-image=`getProperty 'image'`
-docker build -t $image .
+docker build -t ${imageName} .

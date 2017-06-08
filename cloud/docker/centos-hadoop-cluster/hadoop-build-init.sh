@@ -2,11 +2,10 @@
 #
 # Usage: Hadoop Cluster Image build init
 
-source ./hadoop-cluster-conf.sh
+source ./hadoop-cluster-env.sh
 
-yumMirror=`getProperty 'yumMirror'`
 mkdir -p repo
-wget -O repo/CentOS-Base.repo $yumMirror
+wget -O repo/CentOS-Base.repo ${yumMirrorURL}
 
 if [ ! -f ~/.ssh/id_rsa ]; then
     ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa

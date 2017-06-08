@@ -2,20 +2,23 @@
 #
 # Usage: Init Hadoop Cluster
 
+source ./hadoop-cluster-env.sh
+
 hostname=`hostname`
 
-source ./hadoop-cluster-conf.sh
-
-clusterNodes=`getProperty 'clusterNodes'`
-
+# 初始化master节点etc/hadoop/slaves
 if [ $hostname == 'master' ]; then
     cd /usr/local/hadoop
-    echo $clusterNodes | awk -F " " '{for (i = 1; i <= NF; i++) {if ($i != "master") {print $i}}}' > etc/hadoop/slaves
-    hdfsClusterName=`getProperty 'hdfsClusterName'`
+    echo ${nodeHost[*]} | awk -F " " '{for (i = 1; i <= NF; i++) {if ($i != "master") {print $i}}}' > etc/hadoop/slaves
 fi
 
-cat /root/host.tmp >> /etc/hosts
+# 初始化节点/etc/hosts
+for ((i=0; i < ${#nodeHost[*]}; i++))
+do
+    if [ "${nodeHost[$i]}" != "${hostname}" ]; then
+        echo "${nodeIP[$i]} ${nodeHost[$i]}" >> /etc/hosts
+    fi
+done
 
-# cp /etc/hosts /etc/hosts.tmp
-# sed -i 's/172\.24\..*/172\.24\.1\.11 master\n172\.24\.1\.12 slave1\n172\.24\.1\.13 slave2/g' /etc/hosts.tmp
-# cat /etc/hosts.tmp > /etc/hosts
+ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa >/dev/null 2>&1
+echo `cat ~/.ssh/id_rsa.pub`
