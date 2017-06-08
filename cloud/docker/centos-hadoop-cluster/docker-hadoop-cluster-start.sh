@@ -1,14 +1,16 @@
 #!/bin/bash
 
-imageName="centos-hadoop-cluster"
-network="hadoop-cluster"
-networkip="172.24.0.0/16"
-ipPrefix="172.24.1."
-masterIPMappings=(8088 9000 10020 19888 50070 50090)
+source ./hadoop-cluster-conf.sh
+
+image=`getProperty 'image'`
+network=`getProperty 'network'`
+networkip=`getProperty 'networkip'`
+ipPrefix=`getProperty 'ipPrefix'`
+masterPortMappings=`getProperty 'masterPortMappings'`
 
 # 初始化network
-docker network ls | awk '{
-    if (NR > 1 && $2 == "'${network}'") {
+docker network ls | awk 'NR > 1 {
+    if ($2 == "'${network}'") {
         exists = 1;
     }
 } END {
@@ -19,7 +21,7 @@ docker network ls | awk '{
     docker network create --subnet=$networkip $network
 done
 
-echo ${masterIPMappings[*]} | awk 'BEGIN {FS=" "; ORS=""} {for (i = 1; i <= NF; i++) print (NF == 1 ? "" : " ")$i":"$i}'
+port=`echo $masterPortMappings | awk 'BEGIN {FS=" "; ORS=""} {for (i = 1; i <= NF; i++) print (i == 1 ? "" : " ")$i":"$i}'`
 
 # 启动hadoop集群
 ipNumber=10

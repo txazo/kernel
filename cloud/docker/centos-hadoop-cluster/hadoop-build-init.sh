@@ -1,9 +1,12 @@
 #!/bin/bash
+#
+# Usage: Hadoop Cluster Image build init
 
-if [ ! -f repo/CentOS7-Base-163.repo ]; then
-    mkdir -p repo
-    wget -O repo/CentOS7-Base-163.repo http://mirrors.aliyun.com/repo/Centos-7.repo
-fi
+source ./hadoop-cluster-conf.sh
+
+yumMirror=`getProperty 'yumMirror'`
+mkdir -p repo
+wget -O repo/CentOS-Base.repo $yumMirror
 
 if [ ! -f ~/.ssh/id_rsa ]; then
     ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa

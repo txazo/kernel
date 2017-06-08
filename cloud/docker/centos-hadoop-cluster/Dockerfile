@@ -1,7 +1,7 @@
 FROM centos:7
 
 # 更新yum源
-COPY repo/CentOS7-Base-163.repo /etc/yum.repos.d/CentOS-Base.repo
+COPY repo/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo
 
 RUN yum clean all && \
     yum update -y && \
@@ -16,7 +16,7 @@ RUN yum install -y openssh-server openssh-clients && \
     echo -e "\tStrictHostKeyChecking no" >> /etc/ssh/ssh_config
 
 # ssh免密码登录
-ADD ssh/id_rsa ssh/id_rsa.pub /root/.ssh/
+ADD ssh/id_rsa.pub /root/.ssh/
 RUN cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys && \
     chmod 600 /root/.ssh/authorized_keys
 
@@ -24,9 +24,6 @@ RUN cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys && \
 RUN wget --no-cookie --no-check-certificate --header "Cookie: s_cc=true;oraclelicense=accept-securebackup-cookie;gpw_e24=http%3A%2F%2Fwww.oracle.com%2F" http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm && \
     rpm -ivh jdk-8u131-linux-x64.rpm && \
     rm -f jdk-8u131-linux-x64.rpm
-
-# 设置jdk环境变量
-ENV JAVA_HOME /usr/java/default
 
 # 安装hadoop
 RUN wget http://mirror.bit.edu.cn/apache/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz && \
@@ -43,10 +40,10 @@ ADD etc-hadoop/mapred-site.xml $HADOOP_HOME/etc/hadoop/mapred-site.xml
 ADD etc-hadoop/yarn-site.xml $HADOOP_HOME/etc/hadoop/yarn-site.xml
 
 # 修改hadoop中JAVA_HOME
-RUN sed -i 's/export JAVA_HOME.*/export JAVA_HOME=${JAVA_HOME}/g' $HADOOP_HOME/etc/hadoop/hadoop-env.sh
+RUN sed -i '/^export JAVA_HOME.*/s//export JAVA_HOME=\/usr\/java\/default/' $HADOOP_HOME/etc/hadoop/hadoop-env.sh
 
 # 修改path环境变量
-RUN sed -i '/^export PATH/a export JAVA_HOME="${JAVA_HOME}"\nexport CLASSPATH=".:$JAVA_HOME/lib:$JAVA_HOME/jre/lib"\nexport HADOOP_HOME="${HADOOP_HOME}"\nexport PATH="$PATH:$JAVA_HOME/bin:$JAVA_HOME/jre/bin:$HADOOP_HOME/bin:$HADOOP_HOME/sbin"' /etc/profile && \
+RUN sed -i '/^export PATH/a export JAVA_HOME="/usr/java/default"\nexport CLASSPATH=".:$JAVA_HOME/lib:$JAVA_HOME/jre/lib"\nexport HADOOP_HOME="/usr/local/hadoop"\nexport PATH="$PATH:$JAVA_HOME/bin:$JAVA_HOME/jre/bin:$HADOOP_HOME/bin:$HADOOP_HOME/sbin"' /etc/profile && \
     source /etc/profile
 
 RUN yum clean all
@@ -62,6 +59,8 @@ CMD ["/usr/sbin/sshd", "-D"]
 # docker run --name master -h master --network hadoop-cluster --ip 172.24.1.11 -d -P -p 10122:22 -p 8088:8088 -p 9000:9000 -p 10020:10020 -p 19888:19888 -p 50070:50070 -p 50090:50090 centos-hadoop-cluster
 # docker run --name slave1 -h slave1 --network hadoop-cluster --ip 172.24.1.12 -d -P -p 10222:22 centos-hadoop-cluster
 # docker run --name slave2 -h slave2 --network hadoop-cluster --ip 172.24.1.13 -d -P -p 10322:22 centos-hadoop-cluster
+
+# docker run  -d -p 10022:22 centos-hadoop-cluster
 
 # ssh -o StrictHostKeyChecking=no root@192.168.99.100 -p 10122
 # ssh -o StrictHostKeyChecking=no root@192.168.99.100 -p 10222
