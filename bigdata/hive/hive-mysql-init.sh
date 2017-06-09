@@ -24,9 +24,12 @@ ${HADOOP_HOME}/bin/hdfs dfs -chmod 777 /user/hive/warehouse >/dev/null 2>&1
 echo "Copy Hive Configuration File"
 cp conf/hive-env.sh ${HIVE_HOME}/conf
 cp conf/hive-site.xml ${HIVE_HOME}/conf
+# cp ${HIVE_HOME}/conf/hive-log4j2.properties.template ${HIVE_HOME}/conf/hive-log4j2.properties
+# cp ${HIVE_HOME}/conf/hive-exec-log4j2.properties.template ${HIVE_HOME}/conf/hive-exec-log4j2.properties
 
 echo "Copy MySQL Connector Driver"
-mysqlVersion=`ls ~/.m2/repository/mysql/mysql-connector-java | awk -F " " '{print $1}' | sort -r | head -1`
+mysqlVersion="5.1.38"
+# mysqlVersion=`ls ~/.m2/repository/mysql/mysql-connector-java | awk -F " " '{print $1}' | sort -r | head -1`
 cp ~/.m2/repository/mysql/mysql-connector-java/${mysqlVersion}/mysql-connector-java-${mysqlVersion}.jar ${HIVE_HOME}/lib
 
 echo "MySQL init"
