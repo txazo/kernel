@@ -31,39 +31,6 @@ export HIVE_HOME=/usr/local/hive
 export PATH=$PATH:$HIVE_HOME/bin
 ```
 
-初始化`HDFS`:
-
-```
-cd $HADOOP_HOME
-bin/hadoop fs -mkdir -p /tmp/hive
-bin/hadoop fs -mkdir -p /user/hive/warehouse
-bin/hadoop fs -chmod g+w /tmp/hive
-bin/hadoop fs -chmod g+w /user/hive/warehouse
-```
-
-#### Hive配置
-
-```
-cd $HIVE_HOME/conf
-cp hive-env.sh.template hive-env.sh
-cp hive-default.xml.template hive-site.xml
-cp hive-log4j2.properties.template hive-log4j2.properties
-cp hive-exec-log4j2.properties.template hive-exec-log4j2.properties
-```
-
-修改 `hive-site.xml`:
-
-```
-<property>
-    <name>system:java.io.tmpdir</name>
-    <value>/tmp/hive/io</value>
-</property>
-<property>
-    <name>system:user.name</name>
-    <value>hive</value>
-</property>
-```
-
 #### 内嵌模式
 
 ```
@@ -72,33 +39,10 @@ bin/schematool -dbType derby -initSchema
 
 #### 本地模式
 
-```
-<property>
-    <name>javax.jdo.option.ConnectionURL</name>
-    <value>jdbc:mysql://localhost:3306/hive_db?createDatabaseIfNoExist=true&amp;useSSL=true</value>
-</property>
-<property>
-    <name>javax.jdo.option.ConnectionDriverName</name>
-    <value>com.mysql.cj.jdbc.Driver</value>
-</property>
-<property>
-    <name>javax.jdo.option.ConnectionUserName</name>
-    <value>root</value>
-</property>
-<property>
-    <name>javax.jdo.option.ConnectionPassword</name>
-    <value>root</value>
-</property>
-```
-
 `mysql-connector-java-x.x.x.jar`复制到`$HIVE_HOME/lib`目录下
 
 ```
 bin/schematool -dbType mysql -initSchema
-```
-
-```
-bin/hive
 ```
 
 #### 远程模式
