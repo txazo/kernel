@@ -10,5 +10,3 @@ function cleanContainer() {
         echo "Clean Container: ${cid}"
     done
 }
-
-cleanContainer

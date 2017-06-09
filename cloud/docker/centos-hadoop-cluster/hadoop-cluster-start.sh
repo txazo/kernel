@@ -1,4 +1,6 @@
 #!/bin/bash
+#
+# Usage: Start Hadoop Cluster
 
 # master
 cd /usr/local/hadoop

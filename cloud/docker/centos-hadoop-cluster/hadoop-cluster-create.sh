@@ -1,4 +1,6 @@
 #!/bin/bash
+#
+# Usage: Create Hadoop Cluster
 
 source ./docker-util.sh
 source ./hadoop-cluster-env.sh

@@ -1,4 +1,8 @@
+# Build Hadoop Image
+
 FROM centos:7
+
+LABEL maintainer "txazo1218@163.com"
 
 # 更新yum源
 COPY repo/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo
@@ -28,6 +32,7 @@ RUN wget --no-cookie --no-check-certificate --header "Cookie: s_cc=true;oracleli
 # 安装hadoop
 RUN wget http://mirror.bit.edu.cn/apache/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz && \
     tar -zxvf hadoop-2.7.3.tar.gz -C /usr/local && \
+    rm -f hadoop-2.7.3.tar.gz && \
     ln -s /usr/local/hadoop-2.7.3 /usr/local/hadoop
 
 # 设置hadoop环境变量
@@ -51,19 +56,3 @@ RUN yum clean all
 # 启动sshd
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]
-
-# docker build -t centos-hadoop-cluster .
-
-# docker network create --subnet=172.24.0.0/16 hadoop-cluster
-
-# docker run --name master -h master --network hadoop-cluster --ip 172.24.1.11 -d -P -p 10122:22 -p 8088:8088 -p 9000:9000 -p 10020:10020 -p 19888:19888 -p 50070:50070 -p 50090:50090 centos-hadoop-cluster
-# docker run --name slave1 -h slave1 --network hadoop-cluster --ip 172.24.1.12 -d -P -p 10222:22 centos-hadoop-cluster
-# docker run --name slave2 -h slave2 --network hadoop-cluster --ip 172.24.1.13 -d -P -p 10322:22 centos-hadoop-cluster
-
-# docker run  -d -p 10022:22 centos-hadoop-cluster
-
-# ssh -o StrictHostKeyChecking=no root@192.168.99.100 -p 10122
-# ssh -o StrictHostKeyChecking=no root@192.168.99.100 -p 10222
-# ssh -o StrictHostKeyChecking=no root@192.168.99.100 -p 10322
-# ssh -o StrictHostKeyChecking=no root@172.24.1.12
-# ssh -o StrictHostKeyChecking=no root@172.24.1.13

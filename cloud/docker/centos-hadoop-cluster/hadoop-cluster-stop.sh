@@ -1,4 +1,6 @@
 #!/bin/bash
+#
+# Usage: Stop Hadoop Cluster
 
 # master
 cd /usr/local/hadoop
