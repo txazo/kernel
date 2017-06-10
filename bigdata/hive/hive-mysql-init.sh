@@ -28,6 +28,9 @@ cp conf/hive-site.xml ${HIVE_HOME}/conf
 if [ $hiveVersion -eq 2  ]; then
     cp ${HIVE_HOME}/conf/hive-log4j2.properties.template ${HIVE_HOME}/conf/hive-log4j2.properties
     cp ${HIVE_HOME}/conf/hive-exec-log4j2.properties.template ${HIVE_HOME}/conf/hive-exec-log4j2.properties
+else
+    cp ${HIVE_HOME}/conf/hive-log4j.properties.template ${HIVE_HOME}/conf/hive-log4j.properties
+    cp ${HIVE_HOME}/conf/hive-exec-log4j.properties.template ${HIVE_HOME}/conf/hive-exec-log4j.properties
 fi
 
 echo "Copy MySQL Connector Driver"
