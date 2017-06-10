@@ -1,4 +1,4 @@
-## Hive CLI命令
+## Hive CLI
 
 清屏: `Ctrl + L` 或 `!clear;`
 

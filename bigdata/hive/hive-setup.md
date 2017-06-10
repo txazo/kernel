@@ -5,7 +5,7 @@
 * 系统: Mac OS X 10.10.2
 * JDK: 1.8.0_131
 * Hadoop: 2.7.3
-* Hive: 2.1.1
+* Hive: 1.2.2
 
 #### 安装JDK和Hadoop
 
@@ -18,13 +18,13 @@
 安装Hive:
 
 ```
-tar -zxvf apache-hive-2.1.1-bin.tar.gz -C /usr/local
+tar -zxvf apache-hive-1.2.2-bin.tar.gz -C /usr/local
 cd /usr/local
-mv apache-hive-2.1.1-bin hive-2.1.1
-ln -s hive-2.1.1 hive
+mv apache-hive-1.2.2-bin hive-1.2.2
+ln -s hive-1.2.2 hive
 ```
 
-配置Hive环境变量，修改 `/etc/profile`:
+配置`HIVE_HOME`环境变量，修改 `/etc/profile`:
 
 ```
 export HIVE_HOME=/usr/local/hive
