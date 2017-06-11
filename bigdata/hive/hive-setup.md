@@ -1,4 +1,4 @@
-## Hive
+## Hive安装
 
 #### 环境说明
 
@@ -37,12 +37,6 @@ export PATH=$PATH:$HIVE_HOME/bin
 bin/schematool -dbType derby -initSchema
 ```
 
-#### 本地模式
+#### 本地模式和远程模式
 
-`mysql-connector-java-x.x.x.jar`复制到`$HIVE_HOME/lib`目录下
-
-```
-bin/schematool -dbType mysql -initSchema
-```
-
-#### 远程模式
+执行: [hive-mysql-init.sh](hive-mysql-init.sh)

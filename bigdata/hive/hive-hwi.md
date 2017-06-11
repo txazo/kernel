@@ -18,7 +18,7 @@ copy以下jar包到`${HIVE_HOME}/lib`目录:
 #### HWI启动
 
 ```
-bin/hive --service hwi
+bin/hive --service hwi &
 ```
 
 HWI访问: [http://127.0.0.1:9999/hwi](http://127.0.0.1:9999/hwi)
