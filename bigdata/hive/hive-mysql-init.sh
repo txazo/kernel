@@ -2,7 +2,7 @@
 #
 # Usage: Hive with MySQL init
 
-hiveVersion=1
+hiveVersion=2
 HIVE_HOME=/usr/local/hive
 HADOOP_HOME=/usr/local/hadoop
 
